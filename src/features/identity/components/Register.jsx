@@ -1,8 +1,45 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+
+import { useForm } from "react-hook-form";
+import {
+  Link,
+  useActionData,
+  useNavigate,
+  useNavigation,
+  useRouteError,
+  useSubmit,
+} from "react-router-dom";
 
 import logo from "@assets/images/logo.svg";
 
+import { httpService } from "../../../core/http-service";
+
 const Register = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  const submitForm = useSubmit();
+  const onSubmit = (data) => {
+    const { confirmPassword, ...userData } = data;
+    submitForm(userData, { method: "post" });
+    console.log(confirmPassword);
+  };
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state !== "idle";
+  const isSuccessOperation = useActionData();
+  const navigate = useNavigate();
+  const routeErrors = useRouteError();
+  useEffect(() => {
+    if (isSuccessOperation) {
+      setTimeout(() => {
+        navigate("/login");
+      });
+    }
+  }, [isSuccessOperation, navigate]);
   return (
     <>
       <div className="text-center mt-4">
@@ -22,34 +59,101 @@ const Register = () => {
       <div className="card">
         <div className="card-body">
           <div className="m-sm-4">
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-3">
                 <label className="form-label">موبایل</label>
-                <input className="form-control form-control-lg" />
-                <p className="text-danger small fw-bolder mt-1"></p>
+                <input
+                  {...register("mobile", {
+                    required: "وارد کردن موبایل الزامی است",
+                    minLength: 11,
+                    maxLength: 11,
+                  })}
+                  className={`form-control form-control-lg ${
+                    errors.mobile && `is-invalid`
+                  }`}
+                />
+                {errors.mobile && errors.mobile.type === "required" && (
+                  <p className="text-danger small fw-bolder mt-1">
+                    {errors.mobile?.message}
+                  </p>
+                )}
+                {errors.mobile &&
+                  (errors.mobile.type === "minLength" ||
+                    errors.mobile.type === "maxLength") && (
+                    <p className="text-danger small fw-bolder mt-1">
+                      موبایل باید 11 رقم باشد
+                    </p>
+                  )}
               </div>
               <div className="mb-3">
                 <label className="form-label">رمز عبور</label>
                 <input
-                  className="form-control form-control-lg"
+                  {...register("password", {
+                    required: "وارد کردن رمز عبور الزامی است",
+                  })}
+                  className={`form-control form-control-lg ${
+                    errors.password && `is-invalid`
+                  }`}
                   type="password"
                 />
-                <p className="text-danger small fw-bolder mt-1"></p>
+                {errors.password && errors.password.type === "required" && (
+                  <p className="text-danger small fw-bolder mt-1">
+                    {errors.password?.message}
+                  </p>
+                )}
               </div>
               <div className="mb-3">
                 <label className="form-label">تکرار رمز عبور</label>
                 <input
-                  className="form-control form-control-lg"
+                  {...register("confirmPassword", {
+                    required: "وارد کردن تکرار رمز عبور الزامی است",
+                    validate: (value) => {
+                      if (watch("password") !== value) {
+                        return "عدم تطابق با رمز عبور وارد شده";
+                      }
+                    },
+                  })}
+                  className={`form-control form-control-lg ${
+                    errors.confirmPassword && `is-invalid`
+                  }`}
                   type="password"
                 />
-                <p className="text-danger small fw-bolder mt-1"></p>
-                <p className="text-danger small fw-bolder mt-1"></p>
+                {errors.confirmPassword &&
+                  errors.confirmPassword.type === "required" && (
+                    <p className="text-danger small fw-bolder mt-1">
+                      {errors.confirmPassword?.message}
+                    </p>
+                  )}
+                {errors.confirmPassword &&
+                  errors.confirmPassword.type === "validate" && (
+                    <p className="text-danger small fw-bolder mt-1">
+                      {errors.confirmPassword?.message}
+                    </p>
+                  )}
               </div>
               <div className="text-center mt-3">
-                <button type="submit" className="btn btn-lg btn-primary">
-                  ثبت نام کنید
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn btn-lg btn-primary"
+                >
+                  {isSubmitting ? "در حال انجام عملیات" : "ثبت نام کنید"}
                 </button>
               </div>
+              {isSuccessOperation && (
+                <div className="alert alert-success text-success p-2 mt-3">
+                  عملیات با موفقیت انجام شد. به صفحه ورود منتقل می شوید
+                </div>
+              )}
+              {routeErrors && (
+                <div className="alert alert-danger text-danger p-2 mt-3">
+                  {routeErrors.response?.data.map((error) => (
+                    <p className="mb-0" key={error.name}>
+                      {error.description}
+                    </p>
+                  ))}
+                </div>
+              )}
             </form>
           </div>
         </div>
@@ -59,3 +163,11 @@ const Register = () => {
 };
 
 export default Register;
+
+// eslint-disable-next-line react-refresh/only-export-components
+export async function registerAction({ request }) {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+  const response = await httpService.post("/Users", data);
+  return response.status === 200;
+}
