@@ -12,8 +12,7 @@ import {
 } from "react-router-dom";
 
 import logo from "@assets/images/logo.svg";
-
-import { httpService } from "../../../core/http-service";
+import { httpService } from "@core/http-service";
 
 const Register = () => {
   const {
@@ -22,10 +21,10 @@ const Register = () => {
     watch,
     formState: { errors },
   } = useForm();
-
   const { t } = useTranslation();
 
   const submitForm = useSubmit();
+
   const onSubmit = (data) => {
     const { confirmPassword, ...userData } = data;
     submitForm(userData, { method: "post" });
@@ -33,28 +32,31 @@ const Register = () => {
   };
   const navigation = useNavigation();
   const isSubmitting = navigation.state !== "idle";
-  const isSuccessOperation = useActionData();
-  const navigate = useNavigate();
+
   const routeErrors = useRouteError();
+  const isSuccessOperation = useActionData();
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (isSuccessOperation) {
       setTimeout(() => {
         navigate("/login");
-      });
+      }, 3000);
     }
   }, [isSuccessOperation, navigate]);
+
   return (
     <>
       <div className="text-center mt-4">
         <img src={logo} style={{ height: "100px" }} />
-        <h1 className="h2">پلتفرم آموزش آنلاین</h1>
+        <h1 className="h2">{t("register.title")}</h1>
+        <p className="lead">{t("register.introMessage")}</p>
         <p className="lead">
-          جهت استفاده از ویژگی های پلتفرم آموزش آنلاین کلاسبن ثبت نام کنید
-        </p>
-        <p className="lead">
-          قبلا ثبت نام کرده اید؟
+          {t("register.alreadyRegistered")}
+          &nbsp;
           <Link to="/login" className="me-2">
-            وارد شوید
+            {t("register.signIn")}
           </Link>
         </p>
       </div>
@@ -64,67 +66,67 @@ const Register = () => {
           <div className="m-sm-4">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-3">
-                <label className="form-label">موبایل</label>
+                <label className="form-label">{t("register.mobile")}</label>
                 <input
                   {...register("mobile", {
-                    required: "وارد کردن موبایل الزامی است",
+                    required: true,
                     minLength: 11,
                     maxLength: 11,
                   })}
                   className={`form-control form-control-lg ${
-                    errors.mobile && `is-invalid`
+                    errors.mobile && "is-invalid"
                   }`}
                 />
                 {errors.mobile && errors.mobile.type === "required" && (
                   <p className="text-danger small fw-bolder mt-1">
-                    {errors.mobile?.message}
+                    {t("register.validation.mobileRequired")}
                   </p>
                 )}
                 {errors.mobile &&
                   (errors.mobile.type === "minLength" ||
                     errors.mobile.type === "maxLength") && (
                     <p className="text-danger small fw-bolder mt-1">
-                      موبایل باید 11 رقم باشد
+                      {t("register.validation.mobileLength")}
                     </p>
                   )}
               </div>
               <div className="mb-3">
-                <label className="form-label">رمز عبور</label>
+                <label className="form-label">{t("register.password")}</label>
                 <input
-                  {...register("password", {
-                    required: "وارد کردن رمز عبور الزامی است",
-                  })}
+                  {...register("password", { required: true })}
                   className={`form-control form-control-lg ${
-                    errors.password && `is-invalid`
+                    errors.password && "is-invalid"
                   }`}
                   type="password"
                 />
                 {errors.password && errors.password.type === "required" && (
                   <p className="text-danger small fw-bolder mt-1">
-                    {errors.password?.message}
+                    {t("register.validation.passwordRequired")}
                   </p>
                 )}
               </div>
               <div className="mb-3">
-                <label className="form-label">تکرار رمز عبور</label>
+                <label className="form-label">
+                  {t("register.repeatPassword")}
+                </label>
                 <input
                   {...register("confirmPassword", {
-                    required: "وارد کردن تکرار رمز عبور الزامی است",
+                    required: true,
                     validate: (value) => {
                       if (watch("password") !== value) {
-                        return "عدم تطابق با رمز عبور وارد شده";
+                        return t("register.validation.notMatching");
                       }
                     },
                   })}
                   className={`form-control form-control-lg ${
-                    errors.confirmPassword && `is-invalid`
+                    errors.confirmPassword && "is-invalid"
                   }`}
                   type="password"
                 />
                 {errors.confirmPassword &&
                   errors.confirmPassword.type === "required" && (
                     <p className="text-danger small fw-bolder mt-1">
-                      {errors.confirmPassword?.message}
+                      {t("register.validation.repeatPasswordRequired")}
                     </p>
                   )}
                 {errors.confirmPassword &&
@@ -140,22 +142,21 @@ const Register = () => {
                   disabled={isSubmitting}
                   className="btn btn-lg btn-primary"
                 >
-                  {t("register.register")}
-                  {/* {isSubmitting ? "در حال انجام عملیات" : "ثبت نام کنید"} */}
+                  {isSubmitting ? t("register.saving") : t("register.register")}
                 </button>
               </div>
-              {isSuccessOperation && (
-                <div className="alert alert-success text-success p-2 mt-3">
-                  عملیات با موفقیت انجام شد. به صفحه ورود منتقل می شوید
-                </div>
-              )}
               {routeErrors && (
                 <div className="alert alert-danger text-danger p-2 mt-3">
                   {routeErrors.response?.data.map((error) => (
-                    <p className="mb-0" key={error.name}>
-                      {error.description}
+                    <p className="mb-0" key={error.id}>
+                      {t(`register.validation.${error.code}`)}
                     </p>
                   ))}
+                </div>
+              )}
+              {isSuccessOperation && (
+                <div className="alert alert-success text-success p-2 mt-3">
+                  {t("register.successOperation")}
                 </div>
               )}
             </form>
@@ -166,8 +167,6 @@ const Register = () => {
   );
 };
 
-export default Register;
-
 // eslint-disable-next-line react-refresh/only-export-components
 export async function registerAction({ request }) {
   const formData = await request.formData();
@@ -175,3 +174,5 @@ export async function registerAction({ request }) {
   const response = await httpService.post("/Users", data);
   return response.status === 200;
 }
+
+export default Register;
