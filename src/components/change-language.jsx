@@ -10,6 +10,9 @@ const ChangeLanguage = () => {
   const ref = useRef();
 
   const { language, changeLanguage } = useAppContext();
+  useEffect(() => {
+    setShow(false);
+  }, [language]);
 
   useEffect(() => {
     const checkIfClickOutside = (e) => {
