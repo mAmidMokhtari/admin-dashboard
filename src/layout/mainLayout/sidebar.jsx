@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 import logo from "@assets/images/logo.svg";
 
@@ -20,7 +21,7 @@ const Sidebar = () => {
             {t("mainLayout.sidebar.courseManagement")}
           </li>
           <li className="sidebar-item">
-            <a className="sidebar-link">
+            <Link className="sidebar-link" to={"/"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -40,10 +41,10 @@ const Sidebar = () => {
               <span className="align-middle me-2">
                 {t("mainLayout.sidebar.allCourses")}
               </span>
-            </a>
+            </Link>
           </li>
           <li className="sidebar-item">
-            <a className="sidebar-link">
+            <Link className="sidebar-link" to={"/course-categories"}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -63,7 +64,7 @@ const Sidebar = () => {
               <span className="align-middle me-2">
                 {t("mainLayout.sidebar.coursesCategory")}
               </span>
-            </a>
+            </Link>
           </li>
           <li className="sidebar-item">
             <a className="sidebar-link">
