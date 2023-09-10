@@ -1,12 +1,15 @@
 import { createBrowserRouter } from "react-router-dom";
 
+import CourseDetails, {
+  courseDetailsLoader,
+} from "./features/courses/components/course-details";
 import Login, { loginAction } from "./features/identity/components/Login";
 import Register, {
   registerAction,
 } from "./features/identity/components/Register";
 import IdentityLayout from "./layout/identity-layout";
 import MainLayout from "./layout/mainLayout/main-layout";
-import CourseCategories from "./pages/course-categories";
+import CourseCategories, { categoriesLoader } from "./pages/course-categories";
 import Courses, { coursesLoader } from "./pages/Courses";
 
 const router = createBrowserRouter([
@@ -22,6 +25,12 @@ const router = createBrowserRouter([
       {
         path: "course-categories",
         element: <CourseCategories />,
+        loader: categoriesLoader,
+      },
+      {
+        path: "courses/:id",
+        element: <CourseDetails />,
+        loader: courseDetailsLoader,
       },
     ],
   },
