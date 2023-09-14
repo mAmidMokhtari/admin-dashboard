@@ -1,8 +1,12 @@
+/* eslint-disable react/prop-types */
 import _ from "lodash";
 import { useSearchParams } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
-const Pagination = ({ totalRecords, pageSize = 2 }) => {
+const Pagination = ({
+  totalRecords,
+  pageSize = import.meta.env.VITE_PAGE_SIZE,
+}) => {
   const pages = Math.ceil(totalRecords / pageSize);
   const [searchParams, setSearchParams] = useSearchParams();
 
