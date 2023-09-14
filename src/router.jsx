@@ -12,11 +12,14 @@ import IdentityLayout from "./layout/identity-layout";
 import MainLayout from "./layout/mainLayout/main-layout";
 import CourseCategories, { categoriesLoader } from "./pages/course-categories";
 import Courses, { coursesLoader } from "./pages/Courses";
+import NotFound from "./pages/not-found";
+import UnhandledException from "./pages/unhandled-exception";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
+    errorElement: <UnhandledException />,
     children: [
       {
         element: <Courses />,
@@ -56,6 +59,10 @@ const router = createBrowserRouter([
         errorElement: <Register />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 

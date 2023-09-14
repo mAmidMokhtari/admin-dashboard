@@ -23,7 +23,7 @@ function App() {
   }, [theme]);
   return (
     <>
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
       <ToastContainer rtl />
     </>
   );
