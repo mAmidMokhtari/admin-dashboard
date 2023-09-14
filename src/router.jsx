@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
+import { CategoryProvider } from "./features/categories/components/category-context";
 import CourseDetails, {
   courseDetailsLoader,
 } from "./features/courses/components/course-details";
@@ -24,7 +25,11 @@ const router = createBrowserRouter([
       },
       {
         path: "course-categories",
-        element: <CourseCategories />,
+        element: (
+          <CategoryProvider>
+            <CourseCategories />
+          </CategoryProvider>
+        ),
         loader: categoriesLoader,
       },
       {
